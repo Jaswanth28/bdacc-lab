@@ -1,8 +1,10 @@
 sudo apt remove default-jdk default-jre openjdk-headless
 sudo apt install openjdk-8-jdk openjdk-8-jre
-sudo nano .bashrc
+java -version
+sudo nano ~/.bashrc
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-export PATH=$PATH:$JAVA_HOME (esc + :wq)
+export PATH=$PATH:$JAVA_HOME
+source ~/.bashrc
 sudo adduser hadoop
 sudo usermod -aG sudo hadoop
 --now switch to hadoop user----
@@ -13,10 +15,10 @@ chmod 0600 ~/.ssh/authorized_keys
 hdfs namenode -format
 ssh localhost
 exit
-download hadoop file from
-https://www.apache.org/dyn/closer.cgi/hadoop/common/hadoop-3.2.4/hadoop-3.2.4.tar.gz
-tar -xvzf hadoop.tar.gz
-sudo mv hadoop/usr/local/hadoop
+download hadoop file from web
+go to downloads and unzip
+tar -xvzf hadoop-3.3.6.tar.gz
+sudo mv hadoop-3.3.6 /usr/local/hadoop
 sudo nano /etc/profile.d/hadoop_java.sh
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export HADOOP_HOME=/usr/local/hadoop
@@ -27,16 +29,17 @@ export HADOOP_COMMON_HOME=$HADOOP_HOME
 export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
 export PATH=$PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
 export HADOOP_OPTS="$HADOOP_OPTS -Djava.library.path=$HADOOP_HOME/lib/native"
-save and exit
+source /etc/profile.d/hadoop_java.sh
+hadoop version
 sudo chown -R hadoop:hadoop /usr/local/hadoop
 cd $HADOOP_HOME
 mkdir hdfs htemp
 sudo chown -R hadoop:hadoop /usr/local/hadoop/hdfs
 sudo chown -R hadoop:hadoop /usr/local/hadoop/htemp
-cd hadoop/etc/hadoop
-1.sudo nano hadoop-env.h
-JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-2.sudo nano core-site.xml
+cd $HADOOP_HOME/etc/hadoop
+in hadoop-env.sh
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+in core-site.xml
 <configuration> 
 <property> 
 <name>fs.defaultFS</name> 
@@ -54,25 +57,24 @@ JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 <name>hadoop.proxyuser.server.groups</name> <value>*</value> 
 </property> 
 </configuration>
-3.sudo nano hdfs-site.xml
+in hdfs-site.xml
 <configuration> 
 <property> 
 <name>dfs.replication</name> 
 <value>1</value> 
 </property> 
 </configuration>
-4.sudo nano mapred-site.xml
+in marped-site.xml
 <configuration> 
 <property> 
 <name>mapreduce.framework.name</name> <value>yarn</value> 
 </property> 
 <property>
 <name>mapreduce.application.classpath</name> 
-<value>$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*:$HADOOP_MAPRED_
-HOME/share/hadoop/mapreduce/lib/*</value> 
+<value>$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*:$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*</value> 
 </property> 
 </configuration>
-5.sudo nano yarn-site.xml
+in yarn-site.xml
 <configuration> 
 <property> 
 <name>yarn.nodemanager.aux-services</name> 
@@ -80,14 +82,10 @@ HOME/share/hadoop/mapreduce/lib/*</value>
 </property> 
 <property> 
 <name>yarn.nodemanager.env-whitelist</name> 
-<value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP
-_CONF_DIR,CLASSPATH_PREP 
-END_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value> 
+<value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value> 
 </property> 
 </configuration>
-ssh localhost 
 hdfs namenode -format
-export PDSH_RCMD_TYPE=ssh
 start-all.sh
 jps
 stop-all.sh
